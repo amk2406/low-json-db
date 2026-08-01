@@ -8,7 +8,7 @@
   },
   "repository": {"type": "git", "url": "https://github.com/amk2406/low-json-db"},
   "keywords": ["json database", "database", "simple db", "file system database", "filebase db"],
-  "author": "Amk <john@example.com>",
+  "author": "Amk <abdulamk2406@gmail.com>",
   "license": "ISC",
   "type": "commonjs"
 }
