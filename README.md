@@ -3,7 +3,6 @@
 A lightweight, zero-dependency, file-based document database for Node.js.
 
 It stores each collection as a plain JSON file and offers a familiar MongoDB-style API, with indexes, transactions, async support, and more.
-<img src="https://amk2406.github.io/low-json-db/icon.jpeg" alt="low-json-db icon">
 
 ## Features
 
