@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="./icon.jpeg" type="image/x-icon">
+  <title>low-json-db – Lightweight JSON Database for Node.js</title>
+  <meta name="description" content="A lightweight, zero-dependency, file-based document database for Node.js with MongoDB-style API, indexes, transactions and async support." />
+  
+  <!-- Favicon placeholder - replace with your own -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:0.6rem;">
+      <button onclick="toggleSidebar()" style="background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;">☰</button>
+      <strong>low-json-db</strong>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <!-- Logo placeholder - replace the div with an <img> later -->
+        <div class="logo-placeholder">LJ</div>
+        <div class="logo-text">low-<span>json</span>-db</div>
+      </div>
+
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input id="search-input" type="text" placeholder="Search docs..." autocomplete="off" />
+        <div id="search-results" style="display:none;position:absolute;top:110%;left:0;right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow:auto;z-index:20;"></div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Getting Started</div>
+        <div class="nav-links">
+          <a href="index.html" class="active">Home</a>
+          <a href="installation.html">Installation</a>
+          <a href="quick-start.html">Quick Start</a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Core Concepts</div>
+        <div class="nav-links">
+          <a href="collections.html">Collections</a>
+          <a href="inserting.html">Inserting</a>
+          <a href="querying.html">Querying</a>
+          <a href="updating.html">Updating</a>
+          <a href="deleting.html">Deleting</a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Advanced</div>
+        <div class="nav-links">
+          <a href="indexes.html">Indexes</a>
+          <a href="transactions.html">Transactions</a>
+          <a href="async.html">Async API</a>
+          <a href="ids.html">ID Generation</a>
+          <a href="import-backup.html">Import & Backup</a>
+          <a href="events.html">Events</a>
+          <a href="options.html">Collection Options</a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Reference</div>
+        <div class="nav-links">
+          <a href="api-reference.html">API Reference</a>
+          <a href="examples.html">Examples</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <h1>low-json-db</h1>
+      <p class="lead">
+        A lightweight, zero-dependency, file-based document database for Node.js.  
+        It gives you a familiar MongoDB-style API while storing everything as plain JSON files.
+      </p>
+
+      <div class="note">
+        <strong>Perfect for:</strong> prototypes, small backends, CLI tools, Electron apps, 
+        local configuration stores, and learning how document databases work.
+      </div>
+
+      <h2>Why low-json-db?</h2>
+      <p>
+        Most projects don’t need a full database server. Sometimes you just want to store 
+        structured data in a simple, readable format without installing Redis, MongoDB, or SQLite.
+      </p>
+      <p>
+        <strong>low-json-db</strong> solves this by giving you a clean document-oriented API 
+        on top of the file system. Each collection becomes a single <code>.json</code> file. 
+        Indexes are stored in separate <code>.idx.json</code> files for fast lookups.
+      </p>
+
+      <h2>Key Features</h2>
+
+      <div class="features">
+        <div class="feature-card">
+          <h3>MongoDB-style API</h3>
+          <p>insert, find, update, delete, aggregation – the methods you already know.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Atomic Writes</h3>
+          <p>Data is first written to a temporary file then renamed, protecting against crashes.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Indexes</h3>
+          <p>Optional indexes stored in separate files for fast equality lookups.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Sync + Async</h3>
+          <p>Every method has both a synchronous and an asynchronous version.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Transactions</h3>
+          <p>Simple snapshot-based transactions with commit and rollback.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Zero Dependencies</h3>
+          <p>Only uses Node.js built-in modules. No external packages required.</p>
+        </div>
+        <div class="feature-card">
+          <h3>TypeScript Ready</h3>
+          <p>Full type declarations included out of the box.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Events</h3>
+          <p>Built on EventEmitter so you can listen to inserts, updates, saves, etc.</p>
+        </div>
+      </div>
+
+      <h2>Quick Example</h2>
+      <pre><code class="language-javascript">const { JSONDB } = require('low-json-db');
+
+const db = new JSONDB('./data');
+
+const users = db.collection({
+  name: 'users',
+  autoId: true,
+  indexes: ['email']
+});
+
+// Insert a document
+const user = users.insert({
+  name: 'Alice',
+  email: 'alice@example.com',
+  age: 28
+});
+
+// Find by indexed field (very fast)
+const found = users.findOne({ email: 'alice@example.com' });
+
+// Update
+users.updateOne(
+  { name: 'Alice' },
+  { $set: { age: 29 }, $push: { tags: 'admin' } }
+);
+
+// Async version
+await users.insertAsync({
+  name: 'Bob',
+  email: 'bob@example.com'
+});</code></pre>
+
+      <h2>How it stores data</h2>
+      <p>
+        When you create a collection called <code>users</code>, the library creates:
+      </p>
+      <ul style="margin: 0 0 1.5rem 1.5rem;">
+        <li><code>users.json</code> – the actual documents</li>
+        <li><code>users.idx.json</code> – the index file (only if you defined indexes)</li>
+      </ul>
+      <p>
+        Both files are written atomically. If the process crashes while writing, 
+        the original file remains intact.
+      </p>
+
+      <h2>When to use it</h2>
+      <p><strong>Good fit:</strong></p>
+      <ul style="margin: 0 0 1.25rem 1.5rem;">
+        <li>Prototypes and MVPs</li>
+        <li>CLI tools and local scripts</li>
+        <li>Electron / desktop applications</li>
+        <li>Small backends with low concurrency</li>
+        <li>Configuration and cache storage</li>
+        <li>Learning document database concepts</li>
+      </ul>
+
+      <p><strong>Not recommended for:</strong></p>
+      <ul style="margin: 0 0 1.5rem 1.5rem;">
+        <li>High-concurrency production servers</li>
+        <li>Very large datasets (hundreds of thousands of documents)</li>
+        <li>Multi-process writes without external locking</li>
+      </ul>
+
+      <div class="note">
+        <strong>Next step:</strong>  
+        Go to the <a href="installation.html">Installation</a> page or jump straight to the 
+        <a href="quick-start.html">Quick Start</a> guide.
+      </div>
+
+      <h2>License & Contributing</h2>
+      <p>
+        low-json-db is released under the <strong>MIT License</strong>.  
+        Contributions are welcome — feel free to open issues or pull requests.
+      </p>
+    </main>
+  </div>
+
+  <!-- Theme toggle button -->
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  </button>
+
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>

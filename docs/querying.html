@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Querying – low-json-db</title>
+  <link rel="icon" href="./icon.jpeg" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+  <div class="topbar"><div style="display:flex;align-items:center;gap:0.6rem;"><button onclick="toggleSidebar()" style="background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;">☰</button><strong>low-json-db</strong></div></div>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo-area"><div class="logo-placeholder">LJ</div><div class="logo-text">low-<span>json</span>-db</div></div>
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input id="search-input" type="text" placeholder="Search docs..." autocomplete="off"/>
+        <div id="search-results" style="display:none;position:absolute;top:110%;left:0;right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow:auto;z-index:20;"></div>
+      </div>
+      <div class="nav-section"><div class="nav-title">Getting Started</div><div class="nav-links"><a href="index.html">Home</a><a href="installation.html">Installation</a><a href="quick-start.html">Quick Start</a></div></div>
+      <div class="nav-section"><div class="nav-title">Core Concepts</div><div class="nav-links"><a href="collections.html">Collections</a><a href="inserting.html">Inserting</a><a href="querying.html" class="active">Querying</a><a href="updating.html">Updating</a><a href="deleting.html">Deleting</a></div></div>
+      <div class="nav-section"><div class="nav-title">Advanced</div><div class="nav-links"><a href="indexes.html">Indexes</a><a href="transactions.html">Transactions</a><a href="async.html">Async API</a><a href="ids.html">ID Generation</a><a href="import-backup.html">Import & Backup</a><a href="events.html">Events</a><a href="options.html">Collection Options</a></div></div>
+      <div class="nav-section"><div class="nav-title">Reference</div><div class="nav-links"><a href="api-reference.html">API Reference</a><a href="examples.html">Examples</a></div></div>
+    </aside>
+    <main class="content">
+      <h1>Querying Documents</h1>
+      <p class="lead">Querying allows you to retrieve documents using filters, sorting, pagination and projection. low-json-db supports a rich set of MongoDB-style operators.</p>
+
+      <h2>find() – Multiple Documents</h2>
+      <pre><code class="language-javascript">// All documents
+const all = users.find().toArray();
+
+// With a filter
+const adults = users.find({ age: { $gte: 18 } }).toArray();
+
+// Multiple conditions (AND)
+const result = users.find({
+  city: 'Lagos',
+  age: { $gt: 30 }
+}).toArray();</code></pre>
+
+      <h2>findOne() – Single Document</h2>
+      <pre><code class="language-javascript">const alice = users.findOne({ name: 'Alice' });
+// returns the document or null</code></pre>
+      <p>When the query is a simple equality on an indexed field, <code>findOne</code> uses the index for extremely fast lookup.</p>
+
+      <h2>Query Builder Methods</h2>
+      <p><code>find()</code> returns a QueryBuilder that supports chaining:</p>
+      <pre><code class="language-javascript">const page = users
+  .find({ age: { $gte: 25 } })
+  .sort({ name: 1 })
+  .skip(0)
+  .limit(10)
+  .project({ name: 1, age: 1, city: 1 })
+  .toArray();</code></pre>
+
+      <h3>Available methods</h3>
+      <table>
+        <tr><th>Method</th><th>Description</th></tr>
+        <tr><td><code>limit(n)</code></td><td>Limit number of results</td></tr>
+        <tr><td><code>skip(n)</code></td><td>Skip the first n results (pagination)</td></tr>
+        <tr><td><code>sort({ field: 1 | -1 })</code></td><td>Sort ascending (1) or descending (-1)</td></tr>
+        <tr><td><code>project({ field: 1 })</code></td><td>Include only selected fields</td></tr>
+        <tr><td><code>toArray()</code></td><td>Execute and return all matching documents</td></tr>
+        <tr><td><code>first()</code></td><td>Return only the first matching document</td></tr>
+        <tr><td><code>count()</code></td><td>Return the number of matching documents</td></tr>
+      </table>
+
+      <h2>Supported Query Operators</h2>
+      <table>
+        <tr><th>Operator</th><th>Meaning</th><th>Example</th></tr>
+        <tr><td><code>$eq</code></td><td>Equal</td><td><code>{ age: { $eq: 30 } }</code></td></tr>
+        <tr><td><code>$ne</code></td><td>Not equal</td><td><code>{ status: { $ne: 'banned' } }</code></td></tr>
+        <tr><td><code>$gt / $gte</code></td><td>Greater than / equal</td><td><code>{ age: { $gte: 18 } }</code></td></tr>
+        <tr><td><code>$lt / $lte</code></td><td>Less than / equal</td><td><code>{ price: { $lt: 100 } }</code></td></tr>
+        <tr><td><code>$in</code></td><td>Value is in array</td><td><code>{ city: { $in: ['Lagos', 'Abuja'] } }</code></td></tr>
+        <tr><td><code>$nin</code></td><td>Value is not in array</td><td><code>{ role: { $nin: ['guest'] } }</code></td></tr>
+        <tr><td><code>$exists</code></td><td>Field exists</td><td><code>{ email: { $exists: true } }</code></td></tr>
+        <tr><td><code>$regex</code></td><td>Regular expression</td><td><code>{ name: { $regex: '^A', $options: 'i' } }</code></td></tr>
+        <tr><td><code>$or / $and / $nor</code></td><td>Logical operators</td><td><code>{ $or: [{ age: 20 }, { city: 'Lagos' }] }</code></td></tr>
+      </table>
+
+      <h2>Nested Fields</h2>
+      <pre><code class="language-javascript">// Documents that look like: { profile: { city: 'Lagos' } }
+users.find({ 'profile.city': 'Lagos' }).toArray();</code></pre>
+
+      <div class="note"><strong>Next:</strong> Learn how to <a href="updating.html">update documents</a>.</div>
+    </main>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg></button>
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>

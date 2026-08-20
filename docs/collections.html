@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collections – low-json-db</title>
+  <link rel="icon" href="./icon.jpeg" type="image/x-icon" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:0.6rem;">
+      <button onclick="toggleSidebar()" style="background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;">☰</button>
+      <strong>low-json-db</strong>
+    </div>
+  </div>
+
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo-area">
+        <div class="logo-placeholder">LJ</div>
+        <div class="logo-text">low-<span>json</span>-db</div>
+      </div>
+
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input id="search-input" type="text" placeholder="Search docs..." autocomplete="off" />
+        <div id="search-results" style="display:none;position:absolute;top:110%;left:0;right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow:auto;z-index:20;"></div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Getting Started</div>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="installation.html">Installation</a>
+          <a href="quick-start.html">Quick Start</a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Core Concepts</div>
+        <div class="nav-links">
+          <a href="collections.html" class="active">Collections</a>
+          <a href="inserting.html">Inserting</a>
+          <a href="querying.html">Querying</a>
+          <a href="updating.html">Updating</a>
+          <a href="deleting.html">Deleting</a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Advanced</div>
+        <div class="nav-links">
+          <a href="indexes.html">Indexes</a>
+          <a href="transactions.html">Transactions</a>
+          <a href="async.html">Async API</a>
+          <a href="ids.html">ID Generation</a>
+          <a href="import-backup.html">Import & Backup</a>
+          <a href="events.html">Events</a>
+          <a href="options.html">Collection Options</a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-title">Reference</div>
+        <div class="nav-links">
+          <a href="api-reference.html">API Reference</a>
+          <a href="examples.html">Examples</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <h1>Working with Collections</h1>
+      <p class="lead">
+        A collection is the equivalent of a table in a relational database or a collection in MongoDB. 
+        In low-json-db, each collection is stored as a single JSON file on disk.
+      </p>
+
+      <h2>Creating a Collection</h2>
+      <p>
+        You can create (or open) a collection in two ways: by passing a simple string, 
+        or by passing a configuration object.
+      </p>
+
+      <h3>Simple style</h3>
+      <pre><code class="language-javascript">const users = db.collection('users');</code></pre>
+
+      <h3>With options (recommended)</h3>
+      <pre><code class="language-javascript">const users = db.collection({
+  name: 'users',
+  autoId: true,                // automatically generate _id
+  idType: 'auto',              // 'auto' | 'uuid' | 'objectid'
+  indexes: ['email', 'city'],  // fields to index
+  pretty: true                 // pretty-print the JSON file
+});</code></pre>
+
+      <div class="note">
+        <strong>Important:</strong> The collection is created lazily. The actual 
+        <code>.json</code> file is only written when you insert the first document.
+      </div>
+
+      <h2>What happens on disk?</h2>
+      <p>When you use a collection named <code>users</code>, the library manages these files:</p>
+      <ul style="margin: 0 0 1.5rem 1.5rem;">
+        <li><code>users.json</code> – contains the array of documents</li>
+        <li><code>users.idx.json</code> – contains the indexes (only if you defined any)</li>
+        <li><code>users.tmp.json</code> – temporary file used during atomic writes</li>
+      </ul>
+
+      <h2>Listing Collections</h2>
+      <pre><code class="language-javascript">const names = db.listCollections();
+console.log(names); // ['users', 'products', 'orders']</code></pre>
+
+      <h2>Dropping a Collection</h2>
+      <p>
+        This permanently deletes the collection file and its index file.
+      </p>
+      <pre><code class="language-javascript">const deleted = db.dropCollection('users');
+console.log(deleted); // true if it existed, false otherwise</code></pre>
+
+      <h2>Unloading from Memory</h2>
+      <p>
+        If you are working with many large collections, you can free memory by unloading 
+        a collection that you no longer need:
+      </p>
+      <pre><code class="language-javascript">db.unloadCollection('users');</code></pre>
+      <p>
+        The next time you call <code>db.collection('users')</code>, it will be loaded again from disk.
+      </p>
+
+      <h2>Best Practices</h2>
+      <ul style="margin: 0 0 1.5rem 1.5rem;">
+        <li>Always define indexes for fields you frequently query with equality.</li>
+        <li>Use <code>autoId: true</code> unless you want to manage IDs yourself.</li>
+        <li>Prefer the options object style — it makes your intent clearer.</li>
+        <li>Call <code>unloadCollection()</code> for large collections you only use temporarily.</li>
+      </ul>
+
+      <div class="note">
+        <strong>Next:</strong> Learn how to <a href="inserting.html">insert documents</a>.
+      </div>
+    </main>
+  </div>
+
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  </button>
+
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>

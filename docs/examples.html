@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examples – low-json-db</title>
+  <link rel="icon" href="./icon.jpeg" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" />
+</head>
+<body>
+  <div class="topbar"><div style="display:flex;align-items:center;gap:0.6rem;"><button onclick="toggleSidebar()" style="background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;">☰</button><strong>low-json-db</strong></div></div>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo-area"><div class="logo-placeholder">LJ</div><div class="logo-text">low-<span>json</span>-db</div></div>
+      <div class="search-box"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input id="search-input" type="text" placeholder="Search docs..." autocomplete="off"/><div id="search-results" style="display:none;position:absolute;top:110%;left:0;right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow:auto;z-index:20;"></div></div>
+      <div class="nav-section"><div class="nav-title">Getting Started</div><div class="nav-links"><a href="index.html">Home</a><a href="installation.html">Installation</a><a href="quick-start.html">Quick Start</a></div></div>
+      <div class="nav-section"><div class="nav-title">Core Concepts</div><div class="nav-links"><a href="collections.html">Collections</a><a href="inserting.html">Inserting</a><a href="querying.html">Querying</a><a href="updating.html">Updating</a><a href="deleting.html">Deleting</a></div></div>
+      <div class="nav-section"><div class="nav-title">Advanced</div><div class="nav-links"><a href="indexes.html">Indexes</a><a href="transactions.html">Transactions</a><a href="async.html">Async API</a><a href="ids.html">ID Generation</a><a href="import-backup.html">Import & Backup</a><a href="events.html">Events</a><a href="options.html">Collection Options</a></div></div>
+      <div class="nav-section"><div class="nav-title">Reference</div><div class="nav-links"><a href="api-reference.html">API Reference</a><a href="examples.html" class="active">Examples</a></div></div>
+    </aside>
+    <main class="content">
+      <h1>Examples</h1>
+      <p class="lead">Complete real-world examples showing how to use low-json-db effectively.</p>
+
+      <h2>Complete CRUD Example</h2>
+      <pre><code class="language-javascript">const { JSONDB } = require('low-json-db');
+
+const db = new JSONDB('./data');
+
+const users = db.collection({
+  name: 'users',
+  autoId: true,
+  indexes: ['email']
+});
+
+// Create
+const alice = users.insert({
+  name: 'Alice',
+  email: 'alice@example.com',
+  age: 28,
+  tags: ['admin']
+});
+
+// Read
+const found = users.findOne({ email: 'alice@example.com' });
+
+// Update
+users.updateOne(
+  { name: 'Alice' },
+  { $set: { age: 29 }, $push: { tags: 'founder' } }
+);
+
+// Delete
+users.deleteOne({ name: 'Alice' });</code></pre>
+
+      <h2>Using Transactions</h2>
+      <pre><code class="language-javascript">const tx = users.startTransaction();
+
+try {
+  tx.insert({ name: 'Bob', email: 'bob@example.com' });
+  tx.insert({ name: 'Carol', email: 'carol@example.com' });
+  await tx.commit();
+} catch (err) {
+  await tx.rollback();
+}</code></pre>
+
+      <h2>Async Server Style</h2>
+      <pre><code class="language-javascript">app.post('/users', async (req, res) => {
+  const user = await users.insertAsync(req.body);
+  res.json(user);
+});
+
+app.get('/users/:email', async (req, res) => {
+  const user = await users.findOneAsync({ email: req.params.email });
+  res.json(user || { error: 'Not found' });
+});</code></pre>
+
+      <div class="note">
+        You now have a complete understanding of low-json-db. 
+        Happy coding!
+      </div>
+    </main>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg></button>
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
