@@ -1,14 +1,19 @@
 {
   "name": "low-json-db",
-  "version": "1.0.0",
-  "description": "A lightweight, zero-dependency, file-based document database for Node.js.  ",
-  "main": "db.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "version": "1.0.2",
+  "description": "A lightweight, zero-dependency, file-based document database for Node.js.",
+  "homepage": "https://amk2406.github.io/low-json-db",
+  "bugs": {
+    "url": "https://github.com/amk2406/low-json-db/issues"
   },
-  "repository": {"type": "git", "url": "https://github.com/amk2406/low-json-db"},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amk2406/low-json-db.git"
+  },
+  "main": "db.js",
+  "types": "./db.d.ts",
   "keywords": ["json database", "database", "simple db", "file system database", "filebase db"],
   "author": "Amk <abdulamk2406@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs"
 }
